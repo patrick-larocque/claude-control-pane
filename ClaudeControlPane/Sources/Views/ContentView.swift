@@ -1,15 +1,32 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var store = SettingsStore()
+    @State private var selection: SidebarItem? = .global
+
     var body: some View {
         NavigationSplitView {
-            List {
-                Text("Global Settings")
-            }
-            .navigationTitle("Claude Control Pane")
+            SidebarView(store: store, selection: $selection)
         } detail: {
-            Text("Select a settings scope")
-                .foregroundStyle(.secondary)
+            if let selection {
+                switch selection {
+                case .global:
+                    SettingsDetailView(
+                        manager: store.globalManager,
+                        title: "Global Settings"
+                    )
+                case .project(let path):
+                    if let entry = store.projectManagers.first(where: { $0.path == path }) {
+                        SettingsDetailView(
+                            manager: entry.manager,
+                            title: entry.name
+                        )
+                    }
+                }
+            } else {
+                Text("Select a settings scope")
+                    .foregroundStyle(.secondary)
+            }
         }
         .frame(minWidth: 700, minHeight: 500)
     }
