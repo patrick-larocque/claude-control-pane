@@ -6,6 +6,7 @@ struct ClaudeControlPaneApp: App {
         WindowGroup {
             ContentView()
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: 800, height: 600)
     }
 }
