@@ -1,0 +1,81 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "ClaudeControlPane-arm64-apple-macosx15.0-debug.exe": ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.exe>"]
+  "ClaudeControlPane-arm64-apple-macosx15.0-debug.module": ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.exe>","<ClaudeControlPane-arm64-apple-macosx15.0-debug.module>"]
+  "test": ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.exe>","<ClaudeControlPane-arm64-apple-macosx15.0-debug.module>"]
+default: "main"
+nodes:
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane":
+    is-mutated: true
+commands:
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane-entitlement.plist":
+    tool: write-auxiliary-file
+    inputs: ["<entitlement-plist>","<com.apple.security.get-task-allow>"]
+    outputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane-entitlement.plist"]
+    description: "Write auxiliary file /Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane-entitlement.plist"
+
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/App/ClaudeControlPaneApp.swift","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/Views/ContentView.swift"]
+    outputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources"]
+    description: "Write auxiliary file /Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources"
+
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o"]
+    outputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.product/Objects.LinkFileList"
+
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Library/Developer/CommandLineTools/usr/bin/swiftc"]
+    outputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+
+  "<ClaudeControlPane-arm64-apple-macosx15.0-debug.exe>":
+    tool: phony
+    inputs: ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.exe-CodeSigning>"]
+    outputs: ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.exe>"]
+
+  "<ClaudeControlPane-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules/ClaudeControlPane.swiftmodule"]
+    outputs: ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.module>"]
+
+  "C.ClaudeControlPane-arm64-apple-macosx15.0-debug.exe":
+    tool: shell
+    inputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.product/Objects.LinkFileList"]
+    outputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane"]
+    description: "Linking ./.build/arm64-apple-macosx/debug/ClaudeControlPane"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-L","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug","-o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane","-module-name","ClaudeControlPane","-Xlinker","-no_warn_duplicate_libraries","-emit-executable","-Xlinker","-alias","-Xlinker","_ClaudeControlPane_main","-Xlinker","_main","-Xlinker","-rpath","-Xlinker","@loader_path","@/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.product/Objects.LinkFileList","-target","arm64-apple-macosx14.0","-Xlinker","-add_ast_path","-Xlinker","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules/ClaudeControlPane.swiftmodule","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xlinker","-rpath","-Xlinker","/Library/Developer/CommandLineTools/Library/Developer/Frameworks"]
+
+  "C.ClaudeControlPane-arm64-apple-macosx15.0-debug.exe-entitlements":
+    tool: shell
+    inputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane-entitlement.plist"]
+    outputs: ["<ClaudeControlPane-arm64-apple-macosx15.0-debug.exe-CodeSigning>"]
+    description: "Applying debug entitlements to ./.build/arm64-apple-macosx/debug/ClaudeControlPane"
+    args: ["codesign","--force","--sign","-","--entitlements","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane-entitlement.plist","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane"]
+
+  "C.ClaudeControlPane-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/App/ClaudeControlPaneApp.swift","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/Views/ContentView.swift","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources"]
+    outputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules/ClaudeControlPane.swiftmodule"]
+    description: "Compiling Swift Module 'ClaudeControlPane' (2 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","ClaudeControlPane","-emit-dependencies","-emit-module","-emit-module-path","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules/ClaudeControlPane.swiftmodule","-output-file-map","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/output-file-map.json","-incremental","-c","@/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources","-I","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx14.0","-enable-batch-mode","-index-store-path","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j10","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","ClaudeControlPane_main","-swift-version","6","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","claudecontrolpane"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Package.swift","/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

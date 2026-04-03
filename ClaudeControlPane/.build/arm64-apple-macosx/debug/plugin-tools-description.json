@@ -1,0 +1,243 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.ClaudeControlPane-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources",
+      "importPath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/App/ClaudeControlPaneApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "ClaudeControlPane",
+      "moduleOutputPath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules/ClaudeControlPane.swiftmodule",
+      "objects" : [
+        "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o",
+        "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-enable-batch-mode",
+        "-index-store-path",
+        "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "ClaudeControlPane_main",
+        "-swift-version",
+        "6",
+        "-F",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "claudecontrolpane"
+      ],
+      "outputFileMapPath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules/ClaudeControlPane.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/App/ClaudeControlPaneApp.swift",
+        "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/Views/ContentView.swift"
+      ],
+      "tempsPath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "ClaudeControlPane" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "ClaudeControlPane",
+      "-package-name",
+      "claudecontrolpane",
+      "-incremental",
+      "-c",
+      "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/App/ClaudeControlPaneApp.swift",
+      "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/Views/ContentView.swift",
+      "-I",
+      "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-enable-batch-mode",
+      "-index-store-path",
+      "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "ClaudeControlPane_main",
+      "-swift-version",
+      "6",
+      "-F",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "claudecontrolpane",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "ClaudeControlPane" : [
+
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "enableAllTraits" : false
+  },
+  "writeCommands" : {
+    "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane-entitlement.plist"
+    },
+    "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/App/ClaudeControlPaneApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/Views/ContentView.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/sources"
+    },
+    "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.product/Objects.LinkFileList"
+    },
+    "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+    }
+  }
+}

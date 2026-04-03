@@ -1,0 +1,17 @@
+{
+  "": {
+    "swift-dependencies": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/master.swiftdeps"
+  },
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/App/ClaudeControlPaneApp.swift": {
+    "dependencies": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.d",
+    "object": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swift.o",
+    "swiftmodule": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ClaudeControlPaneApp.swiftdeps"
+  },
+  "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/Sources/Views/ContentView.swift": {
+    "dependencies": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.d",
+    "object": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swift.o",
+    "swiftmodule": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView~partial.swiftmodule",
+    "swift-dependencies": "/Users/sean/conductor/workspaces/claude-control-pane/auckland/ClaudeControlPane/.build/arm64-apple-macosx/debug/ClaudeControlPane.build/ContentView.swiftdeps"
+  }
+}
