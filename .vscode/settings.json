@@ -21,6 +21,12 @@
     "get_project_setup_info",
     "get_vscode_api",
     "fetch",
-    "get_url"
+    "get_url",
+    "create_file",
+    "edit_file",
+    "insert_edit_into_file",
+    "run_in_terminal",
+    "delete_file",
+    "rename_file"
   ]
 }
