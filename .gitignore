@@ -2,3 +2,6 @@
 *.xcuserstate
 xcuserdata/
 *.xcworkspace/xcuserdata/
+
+# Auto Claude data directory
+.auto-claude/

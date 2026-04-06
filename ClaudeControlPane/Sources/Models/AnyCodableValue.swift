@@ -10,15 +10,24 @@ enum AnyCodableValue: Sendable, Equatable {
     case null
 
     static func from(_ any: Any) -> AnyCodableValue {
-        switch any {
-        case let s as String: return .string(s)
-        case let b as Bool: return .bool(b)
-        case let i as Int: return .int(i)
-        case let d as Double: return .double(d)
-        case let arr as [Any]: return .array(arr.map { AnyCodableValue.from($0) })
-        case let dict as [String: Any]: return .dictionary(dict.mapValues { AnyCodableValue.from($0) })
-        default: return .null
+        // NSNumber must be checked first — JSONSerialization returns NSNumber for all
+        // numeric types including booleans, so type-cast order matters.
+        if let n = any as? NSNumber {
+            if n === kCFBooleanTrue as NSNumber || n === kCFBooleanFalse as NSNumber {
+                return .bool(n.boolValue)
+            } else if n.doubleValue == Double(n.intValue) {
+                return .int(n.intValue)
+            } else {
+                return .double(n.doubleValue)
+            }
         }
+        if let s = any as? String { return .string(s) }
+        if let b = any as? Bool { return .bool(b) }
+        if let i = any as? Int { return .int(i) }
+        if let d = any as? Double { return .double(d) }
+        if let arr = any as? [Any] { return .array(arr.map { AnyCodableValue.from($0) }) }
+        if let dict = any as? [String: Any] { return .dictionary(dict.mapValues { AnyCodableValue.from($0) }) }
+        return .null
     }
 
     func toAny() -> Any {

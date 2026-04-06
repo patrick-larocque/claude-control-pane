@@ -12,6 +12,8 @@ struct SettingsDetailView: View {
                 .tabItem { Label("Permissions", systemImage: "lock.shield") }
             EnvVarsView(manager: manager)
                 .tabItem { Label("Environment", systemImage: "terminal") }
+            PluginsView(manager: manager)
+                .tabItem { Label("Plugins", systemImage: "puzzlepiece.extension") }
         }
         .navigationTitle(title)
         .overlay(alignment: .top) {

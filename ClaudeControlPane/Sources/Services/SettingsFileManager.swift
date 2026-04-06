@@ -12,6 +12,7 @@ final class SettingsFileManager {
     private var fileDescriptor: Int32 = -1
     private var dispatchSource: DispatchSourceFileSystemObject?
     private var debounceTask: Task<Void, Never>?
+    private var writeResetTask: Task<Void, Never>?
     private var isWriting = false
 
     init(filePath: String) {
@@ -19,6 +20,14 @@ final class SettingsFileManager {
         self.settings = ClaudeSettings()
         loadFromDisk()
         startWatching()
+    }
+
+    func cleanup() {
+        stopWatching()
+        debounceTask?.cancel()
+        debounceTask = nil
+        writeResetTask?.cancel()
+        writeResetTask = nil
     }
 
     func loadFromDisk() {
@@ -47,19 +56,28 @@ final class SettingsFileManager {
             let url = URL(fileURLWithPath: filePath)
 
             let directory = url.deletingLastPathComponent()
-            if !FileManager.default.fileExists(atPath: directory.path) {
+            let dirCreated = !FileManager.default.fileExists(atPath: directory.path)
+            if dirCreated {
                 try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             }
 
             isWriting = true
             try data.write(to: url, options: .atomic)
-            Task { @MainActor [weak self] in
+            writeResetTask?.cancel()
+            writeResetTask = Task { @MainActor [weak self] in
                 try? await Task.sleep(nanoseconds: 200_000_000)
+                guard !Task.isCancelled else { return }
                 self?.isWriting = false
             }
             self.hasError = false
             self.errorMessage = ""
+
+            // If we just created the directory (watcher couldn't start before), start now.
+            if dirCreated && dispatchSource == nil {
+                startWatching()
+            }
         } catch {
+            isWriting = false
             self.hasError = true
             self.errorMessage = "Write failed: \(error.localizedDescription)"
         }
@@ -91,6 +109,23 @@ final class SettingsFileManager {
 
         source.setEventHandler { [weak self] in
             guard let self = self, !self.isWriting else { return }
+
+            // Detect rename/delete (from atomic write or external deletion).
+            // The fd now points to a stale or deleted inode — restart the watcher.
+            let flags = DispatchSource.FileSystemEvent(rawValue: self.dispatchSource?.data ?? 0)
+            if flags.contains(.rename) || flags.contains(.delete) {
+                self.stopWatching()
+                self.debounceTask?.cancel()
+                self.debounceTask = Task { @MainActor [weak self] in
+                    // Brief settle delay before re-opening path (atomic rename needs to land)
+                    try? await Task.sleep(nanoseconds: 100_000_000)
+                    guard !Task.isCancelled else { return }
+                    self?.startWatching()
+                    self?.loadFromDisk()
+                }
+                return
+            }
+
             self.debounceTask?.cancel()
             self.debounceTask = Task { @MainActor [weak self] in
                 try? await Task.sleep(nanoseconds: 100_000_000)
@@ -103,8 +138,8 @@ final class SettingsFileManager {
             close(fd)
         }
 
-        source.resume()
         self.dispatchSource = source
+        source.resume()
     }
 
     private func stopWatching() {

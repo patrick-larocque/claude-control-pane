@@ -54,14 +54,25 @@ struct SidebarView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            Button {
-                store.addProject()
-            } label: {
-                Label("Add Project...", systemImage: "plus")
+            HStack {
+                Button {
+                    store.addProject()
+                } label: {
+                    Label("Add Project...", systemImage: "plus")
+                }
+                .buttonStyle(.borderless)
+
+                Spacer()
+
+                Button {
+                    store.refreshDiscovery()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(.borderless)
+                .help("Refresh discovered projects")
             }
-            .buttonStyle(.borderless)
             .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .navigationTitle("Claude Control Pane")
         .listStyle(.sidebar)

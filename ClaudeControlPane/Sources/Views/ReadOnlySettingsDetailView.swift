@@ -6,6 +6,7 @@ struct ReadOnlySettingsDetailView: View {
 
     @State private var settings: ClaudeSettings?
     @State private var loadError = false
+    @State private var loadErrorMessage = ""
 
     var body: some View {
         Group {
@@ -17,13 +18,19 @@ struct ReadOnlySettingsDetailView: View {
                         .tabItem { Label("Permissions", systemImage: "lock.shield") }
                     ReadOnlyEnvVarsTab(settings: settings)
                         .tabItem { Label("Environment", systemImage: "terminal") }
+                    ReadOnlyPluginsTab(settings: settings)
+                        .tabItem { Label("Plugins", systemImage: "puzzlepiece.extension") }
                 }
             } else if loadError {
-                ContentUnavailableView(
-                    "Cannot Read Settings",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text("The settings file could not be read.")
-                )
+                ContentUnavailableView {
+                    Label("Cannot Read Settings", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(loadErrorMessage.isEmpty
+                         ? "The settings file could not be read."
+                         : loadErrorMessage)
+                } actions: {
+                    Button("Retry") { loadSettings() }
+                }
             } else {
                 ContentUnavailableView(
                     "No Settings File",
@@ -34,15 +41,17 @@ struct ReadOnlySettingsDetailView: View {
         }
         .navigationTitle(title)
         .overlay(alignment: .top) {
-            HStack {
-                Image(systemName: "eye")
-                    .foregroundStyle(.blue)
-                Text("Read-only \u{2014} add this project to edit its settings")
-                    .font(.callout)
+            if settings != nil {
+                HStack {
+                    Image(systemName: "eye")
+                        .foregroundStyle(.blue)
+                    Text("Read-only \u{2014} add this project to edit its settings")
+                        .font(.callout)
+                }
+                .padding(8)
+                .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                .padding(.top, 8)
             }
-            .padding(8)
-            .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
-            .padding(.top, 8)
         }
         .onAppear { loadSettings() }
     }
@@ -50,10 +59,17 @@ struct ReadOnlySettingsDetailView: View {
     private func loadSettings() {
         let settingsPath = "\(projectPath)/.claude/settings.json"
         guard FileManager.default.fileExists(atPath: settingsPath) else { return }
-        if let loaded = ClaudeSettings.loadFromFile(settingsPath) {
-            settings = loaded
-        } else {
+
+        let url = URL(fileURLWithPath: settingsPath)
+        do {
+            let data = try Data(contentsOf: url)
+            settings = try ClaudeSettings.decode(from: data)
+            loadError = false
+            loadErrorMessage = ""
+        } catch {
+            settings = nil
             loadError = true
+            loadErrorMessage = error.localizedDescription
         }
     }
 }
@@ -145,6 +161,53 @@ private struct ReadOnlyEnvVarsTab: View {
                                 .font(.system(.body, design: .monospaced))
                                 .textSelection(.enabled)
                         }
+                    }
+                }
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+// MARK: - Read-Only Plugins Tab
+
+private struct ReadOnlyPluginsTab: View {
+    let settings: ClaudeSettings
+
+    var body: some View {
+        Form {
+            Section("Enabled Plugins") {
+                let plugins = settings.enabledPlugins.keys.sorted()
+                if plugins.isEmpty {
+                    Text("No plugins configured")
+                        .foregroundStyle(.secondary)
+                        .font(.callout)
+                } else {
+                    ForEach(plugins, id: \.self) { key in
+                        HStack {
+                            Text(key)
+                                .font(.system(.body, design: .monospaced))
+                                .textSelection(.enabled)
+                            Spacer()
+                            let enabled = settings.enabledPlugins[key] ?? false
+                            Image(systemName: enabled ? "checkmark.circle.fill" : "xmark.circle")
+                                .foregroundStyle(enabled ? .green : .secondary)
+                        }
+                    }
+                }
+            }
+
+            Section("Extra Known Marketplaces") {
+                let marketplaces = settings.extraKnownMarketplaces.keys.sorted()
+                if marketplaces.isEmpty {
+                    Text("No extra marketplaces configured")
+                        .foregroundStyle(.secondary)
+                        .font(.callout)
+                } else {
+                    ForEach(marketplaces, id: \.self) { name in
+                        Text(name)
+                            .font(.system(.body, design: .monospaced))
+                            .textSelection(.enabled)
                     }
                 }
             }

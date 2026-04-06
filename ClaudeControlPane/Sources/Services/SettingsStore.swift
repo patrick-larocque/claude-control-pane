@@ -9,11 +9,13 @@ final class SettingsStore {
     var projectManagers: [ProjectEntry] = []
     var discoveredProjects: [DiscoveredProject] = []
 
-    struct ProjectEntry: Identifiable {
+    struct ProjectEntry: Identifiable, Equatable {
         let id: String
         let name: String
         let path: String
         let manager: SettingsFileManager
+
+        static func == (lhs: ProjectEntry, rhs: ProjectEntry) -> Bool { lhs.id == rhs.id }
 
         init(path: String, manager: SettingsFileManager) {
             self.id = path
@@ -23,7 +25,7 @@ final class SettingsStore {
         }
     }
 
-    struct DiscoveredProject: Identifiable {
+    struct DiscoveredProject: Identifiable, Equatable {
         let id: String
         let name: String
         let path: String
@@ -45,10 +47,8 @@ final class SettingsStore {
     }
 
     func loadProjects() {
-        let discovered = Set(ProjectDiscovery.discoverProjects())
-        let custom = Set(UserDefaults.standard.stringArray(forKey: Self.customProjectsKey) ?? [])
+        let custom = UserDefaults.standard.stringArray(forKey: Self.customProjectsKey) ?? []
 
-        // Managed: only explicitly added (custom) paths get a full SettingsFileManager
         let managedPaths = custom.sorted()
         projectManagers = managedPaths.map { path in
             let settingsPath = "\(path)/.claude/settings.json"
@@ -56,9 +56,19 @@ final class SettingsStore {
             return ProjectEntry(path: path, manager: manager)
         }
 
-        // Discovered: auto-found paths that are NOT in the managed set
-        let discoveredOnly = discovered.subtracting(custom).sorted()
-        discoveredProjects = discoveredOnly.map { DiscoveredProject(path: $0) }
+        refreshDiscovery()
+    }
+
+    func refreshDiscovery() {
+        let customPaths = Set(UserDefaults.standard.stringArray(forKey: Self.customProjectsKey) ?? [])
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let discovered = Set(ProjectDiscovery.discoverProjects())
+            let discoveredOnly = discovered.subtracting(customPaths).sorted()
+            let projects = discoveredOnly.map { DiscoveredProject(path: $0) }
+            await MainActor.run {
+                self?.discoveredProjects = projects
+            }
+        }
     }
 
     func addProject() {
@@ -89,6 +99,7 @@ final class SettingsStore {
     }
 
     func promoteDiscoveredProject(_ project: DiscoveredProject) {
+        guard !projectManagers.contains(where: { $0.path == project.path }) else { return }
         var custom = UserDefaults.standard.stringArray(forKey: Self.customProjectsKey) ?? []
         if !custom.contains(project.path) {
             custom.append(project.path)
@@ -105,6 +116,7 @@ final class SettingsStore {
     }
 
     func removeProject(_ entry: ProjectEntry) {
+        entry.manager.cleanup()
         var custom = UserDefaults.standard.stringArray(forKey: Self.customProjectsKey) ?? []
         custom.removeAll { $0 == entry.path }
         UserDefaults.standard.set(custom, forKey: Self.customProjectsKey)

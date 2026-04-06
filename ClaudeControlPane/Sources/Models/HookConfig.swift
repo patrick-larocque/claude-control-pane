@@ -18,8 +18,8 @@ struct Hook: Codable, Sendable, Equatable, Identifiable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = UUID()
-        self.type = try container.decode(String.self, forKey: .type)
-        self.command = try container.decode(String.self, forKey: .command)
+        self.type = (try? container.decode(String.self, forKey: .type)) ?? "command"
+        self.command = (try? container.decode(String.self, forKey: .command)) ?? ""
     }
 }
 
@@ -39,6 +39,6 @@ struct HookGroup: Codable, Sendable, Equatable, Identifiable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = UUID()
-        self.hooks = try container.decode([Hook].self, forKey: .hooks)
+        self.hooks = (try? container.decode([Hook].self, forKey: .hooks)) ?? []
     }
 }

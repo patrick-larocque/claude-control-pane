@@ -21,6 +21,7 @@ struct ContentView: View {
                             manager: entry.manager,
                             title: entry.name
                         )
+                        .id(path)
                     }
                 case .discovered(let path):
                     if let project = store.discoveredProjects.first(where: { $0.path == path }) {
@@ -28,6 +29,7 @@ struct ContentView: View {
                             projectPath: project.path,
                             title: project.name
                         )
+                        .id(path)
                     }
                 }
             } else {
@@ -36,5 +38,27 @@ struct ContentView: View {
             }
         }
         .frame(minWidth: 700, minHeight: 500)
+        .onChange(of: store.projectManagers) { _, _ in
+            validateSelection()
+        }
+        .onChange(of: store.discoveredProjects) { _, _ in
+            validateSelection()
+        }
+    }
+
+    private func validateSelection() {
+        guard let selection else { return }
+        switch selection {
+        case .global:
+            break
+        case .project(let path):
+            if !store.projectManagers.contains(where: { $0.path == path }) {
+                self.selection = .global
+            }
+        case .discovered(let path):
+            if !store.discoveredProjects.contains(where: { $0.path == path }) {
+                self.selection = .global
+            }
+        }
     }
 }

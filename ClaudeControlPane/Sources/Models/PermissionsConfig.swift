@@ -17,6 +17,10 @@ struct PermissionsConfig: Codable, Sendable, Equatable {
         case defaultMode, allow, deny, ask
     }
 
+    var isDefault: Bool {
+        defaultMode == nil && allow.isEmpty && deny.isEmpty && ask.isEmpty
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.defaultMode = try container.decodeIfPresent(String.self, forKey: .defaultMode)

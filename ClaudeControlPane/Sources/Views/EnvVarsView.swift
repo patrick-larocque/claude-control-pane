@@ -5,6 +5,7 @@ struct EnvVarsView: View {
 
     @State private var newKey = ""
     @State private var newValue = ""
+    @State private var showOverwriteWarning = false
 
     private var sortedKeys: [String] {
         manager.settings.env.keys.sorted()
@@ -46,6 +47,7 @@ struct EnvVarsView: View {
                         .textFieldStyle(.roundedBorder)
                         .font(.system(.body, design: .monospaced))
                         .frame(minWidth: 150)
+                        .onChange(of: newKey) { showOverwriteWarning = false }
                     TextField("value", text: $newValue)
                         .textFieldStyle(.roundedBorder)
                         .font(.system(.body, design: .monospaced))
@@ -57,6 +59,12 @@ struct EnvVarsView: View {
                 .onSubmit {
                     addEnvVar()
                 }
+
+                if showOverwriteWarning {
+                    Text("Key already exists — edit the value inline above")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
             }
         }
         .formStyle(.grouped)
@@ -65,6 +73,11 @@ struct EnvVarsView: View {
     private func addEnvVar() {
         let key = newKey.trimmingCharacters(in: .whitespaces)
         guard !key.isEmpty else { return }
+        if manager.settings.env[key] != nil {
+            showOverwriteWarning = true
+            return
+        }
+        showOverwriteWarning = false
         let value = newValue
         manager.updateSettings { $0.env[key] = value }
         newKey = ""
@@ -73,10 +86,13 @@ struct EnvVarsView: View {
 }
 
 struct EnvValueField: View {
-    @State var value: String
+    let externalValue: String
+    @State private var value: String
+    @FocusState private var isFocused: Bool
     var onCommit: (String) -> Void
 
     init(value: String, onCommit: @escaping (String) -> Void) {
+        self.externalValue = value
         self._value = State(initialValue: value)
         self.onCommit = onCommit
     }
@@ -85,8 +101,15 @@ struct EnvValueField: View {
         TextField("Value", text: $value)
             .textFieldStyle(.roundedBorder)
             .font(.system(.body, design: .monospaced))
+            .focused($isFocused)
             .onSubmit {
                 onCommit(value)
+            }
+            .onChange(of: isFocused) { _, newFocused in
+                if !newFocused { onCommit(value) }
+            }
+            .onChange(of: externalValue) { _, newValue in
+                value = newValue
             }
     }
 }

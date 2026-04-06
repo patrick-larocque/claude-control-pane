@@ -89,7 +89,13 @@ struct PermissionListSection: View {
                     HStack {
                         PermissionItemField(
                             value: item,
-                            onCommit: { newValue in onUpdate(index, newValue) }
+                            onCommit: { newValue in
+                                let trimmed = newValue.trimmingCharacters(in: .whitespaces)
+                                guard !trimmed.isEmpty else { return }
+                                // Prevent duplicates: skip if value already exists at a different index
+                                guard !items.enumerated().contains(where: { $0.offset != index && $0.element == trimmed }) else { return }
+                                onUpdate(index, trimmed)
+                            }
                         )
                         Button(role: .destructive) {
                             onRemove(index)
@@ -119,16 +125,23 @@ struct PermissionListSection: View {
     private func addItem() {
         let trimmed = newItem.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
+        guard !items.contains(trimmed) else {
+            newItem = ""
+            return
+        }
         onAdd(trimmed)
         newItem = ""
     }
 }
 
 struct PermissionItemField: View {
-    @State var value: String
+    let externalValue: String
+    @State private var value: String
+    @FocusState private var isFocused: Bool
     var onCommit: (String) -> Void
 
     init(value: String, onCommit: @escaping (String) -> Void) {
+        self.externalValue = value
         self._value = State(initialValue: value)
         self.onCommit = onCommit
     }
@@ -137,8 +150,15 @@ struct PermissionItemField: View {
         TextField("Pattern", text: $value)
             .textFieldStyle(.roundedBorder)
             .font(.system(.body, design: .monospaced))
+            .focused($isFocused)
             .onSubmit {
                 onCommit(value)
+            }
+            .onChange(of: isFocused) { _, newFocused in
+                if !newFocused { onCommit(value) }
+            }
+            .onChange(of: externalValue) { _, newValue in
+                value = newValue
             }
     }
 }
