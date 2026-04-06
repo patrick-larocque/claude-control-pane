@@ -7,10 +7,18 @@ A native macOS SwiftUI app (macOS 14+) that provides a GUI for managing Claude C
 ## Project Structure
 
 ```
-ClaudeControlPane/
-├── Package.swift                          # SPM executable target, Swift 6, macOS 14+
-├── build-app.sh                           # CLI build script -> .app bundle
-└── Sources/
+claude-control-pane/                       # Repo root
+├── .claude/settings.json                  # Claude Code project permissions (tracked)
+├── .github/copilot-instructions.md        # Copilot workspace instructions
+├── .vscode/settings.json                  # Copilot auto-approve rules
+├── .gitignore                             # Ignores .DS_Store, Xcode artifacts
+├── scripts/
+│   ├── new-worktree.sh                    # Create a sandboxed sibling worktree
+│   └── remove-worktree.sh                 # Remove a worktree + optional branch delete
+└── ClaudeControlPane/
+    ├── Package.swift                          # SPM executable target, Swift 6, macOS 14+
+    ├── build-app.sh                           # CLI build script -> .app bundle
+    └── Sources/
     ├── App/
     │   └── ClaudeControlPaneApp.swift     # @main entry point, WindowGroup
     ├── Models/
@@ -91,6 +99,35 @@ Add directory names to `ProjectDiscovery.scanDirectories`. Discovery is recursiv
 - `SidebarItem` enum has three cases: `.global`, `.project(String)`, `.discovered(String)`.
 - `SettingsStore.promoteDiscoveredProject(_:)` saves to UserDefaults, creates a `SettingsFileManager`, and moves the project from discovered to managed.
 - `SettingsStore.addProject()` (manual via NSOpenPanel) also removes from `discoveredProjects` if the path matches.
+
+## Worktree Workflow
+
+This repo uses git worktrees for isolated feature development. Each worktree is a sibling folder on disk with its own `.build/` directory but shares the same `.claude/settings.json`, `.vscode/settings.json`, and agent configs automatically (they're tracked in git).
+
+### Create a worktree
+```bash
+cd /Users/patricklarocque/Documents/claude-control-pane
+./scripts/new-worktree.sh <branch-name>
+# Creates: ~/Documents/claude-control-pane-<branch-name>
+code ../claude-control-pane-<branch-name>
+```
+
+### Remove a worktree
+```bash
+./scripts/remove-worktree.sh <branch-name>
+# Prompts to also delete the local branch
+```
+
+### List active worktrees
+```bash
+git worktree list
+```
+
+### Key isolation properties per worktree
+- `ClaudeControlPane/.build/` — absent until first `swift build` (fully isolated)
+- `.claude/settings.json` — present (tracked, Claude Code permissions work immediately)
+- `.vscode/settings.json` — present (tracked, Copilot auto-approve works immediately)
+- `.github/copilot-instructions.md` — present (tracked)
 
 ## Testing Notes
 
