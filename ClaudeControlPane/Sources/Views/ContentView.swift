@@ -22,6 +22,13 @@ struct ContentView: View {
                             title: entry.name
                         )
                     }
+                case .discovered(let path):
+                    if let project = store.discoveredProjects.first(where: { $0.path == path }) {
+                        ReadOnlySettingsDetailView(
+                            projectPath: project.path,
+                            title: project.name
+                        )
+                    }
                 }
             } else {
                 Text("Select a settings scope")

@@ -59,6 +59,12 @@ extension ClaudeSettings {
         )
     }
 
+    static func loadFromFile(_ path: String) -> ClaudeSettings? {
+        let url = URL(fileURLWithPath: path)
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return try? ClaudeSettings.decode(from: data)
+    }
+
     func encode() throws -> Data {
         var dict: [String: Any] = [:]
 

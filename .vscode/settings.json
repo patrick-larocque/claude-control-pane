@@ -1,0 +1,26 @@
+{
+  "github.copilot.chat.agent.autoApprove": [
+    "read",
+    "search",
+    "read_file",
+    "list_directory",
+    "get_file_contents",
+    "search_files",
+    "search_symbol",
+    "find_files",
+    "grep_search",
+    "file_search",
+    "list_code_usages",
+    "get_symbol_definition",
+    "get_errors_in_range",
+    "get_changed_files",
+    "get_terminal_contents",
+    "get_workspace_folders",
+    "get_terminal_last_command",
+    "read_jupyter_notebook",
+    "get_project_setup_info",
+    "get_vscode_api",
+    "fetch",
+    "get_url"
+  ]
+}

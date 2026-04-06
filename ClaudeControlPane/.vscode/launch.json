@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ClaudeControlPane}",
+            "name": "Debug ClaudeControlPane",
+            "target": "ClaudeControlPane",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug ClaudeControlPane"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ClaudeControlPane}",
+            "name": "Release ClaudeControlPane",
+            "target": "ClaudeControlPane",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release ClaudeControlPane"
+        }
+    ]
+}

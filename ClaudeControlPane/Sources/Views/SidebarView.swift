@@ -3,6 +3,7 @@ import SwiftUI
 enum SidebarItem: Hashable {
     case global
     case project(String)
+    case discovered(String)
 }
 
 struct SidebarView: View {
@@ -28,6 +29,27 @@ struct SidebarView: View {
                                 store.removeProject(entry)
                             }
                         }
+                }
+            }
+
+            if !store.discoveredProjects.isEmpty {
+                Section("Discovered") {
+                    ForEach(store.discoveredProjects) { project in
+                        HStack {
+                            Label(project.name, systemImage: "folder.badge.questionmark")
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Button {
+                                store.promoteDiscoveredProject(project)
+                                selection = .project(project.path)
+                            } label: {
+                                Image(systemName: "plus.circle")
+                            }
+                            .buttonStyle(.borderless)
+                            .help("Add to managed projects")
+                        }
+                        .tag(SidebarItem.discovered(project.path))
+                    }
                 }
             }
         }
