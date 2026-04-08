@@ -1,138 +1,108 @@
 # CLAUDE.md - ClaudeControlPane
 
-## What This Project Is
+## What This Repo Is
 
-A native macOS SwiftUI app (macOS 14+) that provides a GUI for managing Claude Code `settings.json` files -- both the global config (`~/.claude/settings.json`) and per-project configs (`<project>/.claude/settings.json`). Eliminates the need to hand-edit JSON for permissions, hooks, and environment variables.
+Claude Control Pane is a native macOS SwiftUI app for browsing and editing Claude Code configuration across machine-wide and workspace-specific surfaces. It is no longer limited to just hooks, permissions, and environment variables in `settings.json`.
 
-## Project Structure
+## Current Product Surfaces
 
-```
-claude-control-pane/                       # Repo root
-├── .claude/settings.json                  # Claude Code project permissions (tracked)
-├── .github/copilot-instructions.md        # Copilot workspace instructions
-├── .vscode/settings.json                  # Copilot auto-approve rules
-├── .gitignore                             # Ignores .DS_Store, Xcode artifacts
+- Machine settings: `~/.claude/settings.json`
+- Machine global preferences: `~/.claude.json`
+- Machine agents: `~/.claude/agents`
+- Machine skills: `~/.claude/skills`
+- Machine instructions, rules, output styles, and hook scripts
+- Plugin inventory cached under `~/.claude/plugins`
+- Diagnostics for shell PATH and Claude CLI environment guidance
+- Workspace shared settings: `.claude/settings.json`
+- Workspace local settings: `.claude/settings.local.json`
+- Workspace shared MCP: `.mcp.json`
+- Workspace local MCP stored in `~/.claude.json`
+- Workspace agents, skills, and instruction files
+- Read-only previews for discovered but unmanaged projects
+
+## Repo Structure
+
+```text
+claude-control-pane/
+├── .gitignore
+├── README.md
+├── CLAUDE.md
+├── docs/
+│   └── superpowers/                  # Historical plan/spec artifacts
 ├── scripts/
-│   ├── new-worktree.sh                    # Create a sandboxed sibling worktree
-│   └── remove-worktree.sh                 # Remove a worktree + optional branch delete
+│   ├── new-worktree.sh
+│   └── remove-worktree.sh
 └── ClaudeControlPane/
-    ├── Package.swift                          # SPM executable target, Swift 6, macOS 14+
-    ├── build-app.sh                           # CLI build script -> .app bundle
-    └── Sources/
-    ├── App/
-    │   └── ClaudeControlPaneApp.swift     # @main entry point, WindowGroup
-    ├── Models/
-    │   ├── ClaudeSettings.swift           # Root model (permissions, hooks, env, extraFields)
-    │   ├── PermissionsConfig.swift        # defaultMode, allow/deny/ask arrays
-    │   ├── HookConfig.swift               # Hook + HookGroup structs
-    │   └── AnyCodableValue.swift          # Type-safe Any wrapper for JSON round-tripping
-    ├── Services/
-    │   ├── SettingsFileManager.swift       # Load/save/watch a single settings.json file
-    │   ├── SettingsStore.swift             # Manages global + all project managers
-    │   └── ProjectDiscovery.swift          # Scans ~/Documents, ~/code, etc. for projects
-    └── Views/
-        ├── ContentView.swift              # NavigationSplitView (sidebar + detail)
-        ├── SidebarView.swift              # Global settings + project list + discovered + add/remove
-        ├── SettingsDetailView.swift        # TabView (Hooks, Permissions, Environment) - editable
-        ├── ReadOnlySettingsDetailView.swift # Read-only detail view for discovered projects
-        ├── PermissionsView.swift           # Permission mode picker + allow/deny/ask editors
-        ├── HooksView.swift                # Hook event editors + quick-settings toggles
-        └── EnvVarsView.swift              # Key-value environment variable editor
+    ├── Package.swift
+    ├── build-app.sh
+    ├── Sources/
+    │   ├── App/
+    │   ├── Models/
+    │   ├── Services/
+    │   └── Views/
+    └── Tests/
 ```
 
 ## Architecture
 
-**Model / Service / View** layers with `@Observable` (Observation framework, not Combine).
+The app is a Swift Package with one executable target and one test target.
 
-- **Models** are plain `Codable`/`Sendable` structs. `ClaudeSettings` uses manual `JSONSerialization`-based encode/decode to preserve unknown JSON fields round-trip via `AnyCodableValue`.
-- **Services** use `@Observable @MainActor` classes. `SettingsFileManager` owns one file: loads, saves, and watches it via GCD `DispatchSource` with debounce. `SettingsStore` aggregates global + managed project managers + lightweight discovered projects.
-- **Views** are standard SwiftUI. All mutations go through `manager.updateSettings { ... }` which mutates in-place and immediately persists to disk (no manual save step). Discovered (unmanaged) projects use a separate read-only view.
+- Models
+  `ClaudeSettings` and `ClaudeGlobalConfig` own JSON decoding/encoding for Claude settings surfaces.
+  `AnyCodableValue` preserves unknown JSON and supports structured object editing.
+  `Hook` and `HookGroup` model Claude hook handlers, including extended payload shapes.
 
-## Key Design Decisions
+- Services
+  `SettingsFileManager`, `GlobalConfigFileManager`, and `TextFileManager` load, save, validate, and watch files with `DispatchSource`.
+  `SettingsStore` aggregates machine-level managers plus managed/discovered workspaces.
+  `ProjectDiscovery` scans common home-directory roots for Claude workspaces.
+  `DiagnosticsService` derives environment checks and CLI guidance from current settings plus shell state.
 
-- **No Combine** -- uses Swift concurrency (`async`/`await`, `Task`) and `@Observable` macro.
-- **Immediate persistence** -- every UI edit writes to disk instantly. No save button.
-- **Live file watching** -- external edits to `settings.json` (from CLI, other editors) are detected via `DispatchSource` and reflected in the UI with 100ms debounce.
-- **Lossless round-tripping** -- unknown JSON keys are preserved in `extraFields` so the app never drops config it doesn't understand.
-- **Swift 6 strict concurrency** -- all models are `Sendable`, services are `@MainActor`.
-- **Discovered vs Managed projects** -- auto-discovered projects (from `ProjectDiscovery`) appear in a "Discovered" sidebar section as lightweight `DiscoveredProject` structs with no file watchers. Only explicitly added (promoted/manual) projects get a `SettingsFileManager` with file descriptors and GCD watchers. This keeps resource usage minimal.
-- **Read-only preview** -- discovered projects can be clicked to view their settings without adding them. A separate `ReadOnlySettingsDetailView` loads settings via a one-shot `ClaudeSettings.loadFromFile()` call (no watcher). Promoting a project via the [+] button moves it to managed with full editing.
+- Views
+  `ContentView` and `SidebarView` define the top-level navigation.
+  `SettingsDetailView` exposes editable tabs for hooks, permissions, environment, advanced settings, and raw JSON.
+  Additional feature views cover global preferences, MCP, instructions, file/directory editors, diagnostics, and plugin inventory.
 
-## Building
+## Key Behavioral Notes
 
-### Xcode
-Open `ClaudeControlPane/Package.swift` in Xcode, build and run (Cmd+R).
+- Standard settings tabs persist immediately through `manager.updateSettings { ... }`.
+- Text-backed editors use explicit Save/Reload actions and live file watching.
+- Unknown top-level and nested JSON is preserved on round-trip.
+- Object-only editors reject non-object JSON and split empty-input handling by surface:
+  empty advanced objects clear the field; empty MCP maps normalize to `{}`.
+- Project-scoped panes with path-derived local state are keyed by workspace path to avoid stale content when switching projects.
+- Discovered projects stay lightweight until promoted; only managed projects get active file managers and watchers.
 
-### Command Line
+## Feature Map By Layer
+
+- `Sources/Models`
+  Claude settings schema, global config schema, permissions, hooks, dynamic JSON values
+
+- `Sources/Services`
+  Settings/global-config file I/O, text file editing, discovery, diagnostics
+
+- `Sources/Views`
+  Machine/workspace navigation, editable settings tabs, MCP editors, instructions editors, diagnostics, plugin inventory
+
+- `Tests`
+  Round-trip coverage for advanced settings and hooks, global-config MCP behavior, diagnostics checks, and object-editor validation
+
+## Build And Test
+
 ```bash
 cd ClaudeControlPane
-chmod +x build-app.sh
+swift test
+swift build
 ./build-app.sh
-open .build/debug/"Claude Control Pane.app"
 ```
 
-## Code Style
+## Working Conventions
 
-- **Naming**: PascalCase for types, camelCase for properties/methods
-- **State**: `@State private var` for local SwiftUI state, `@Bindable var` for observable service references
-- **Indentation**: 4 spaces
-- **Imports**: Minimal -- `SwiftUI`, `Foundation`, `AppKit`, `Observation` only as needed
-- **No force unwrapping** -- use optional chaining and nil coalescing
-- **Architecture**: Prefer `@Observable` over `ObservableObject`/`@Published`. Avoid Combine.
+- Prefer `@Observable` over Combine-based patterns.
+- Keep JSON round-tripping lossless when adding new fields.
+- Use `rg` for search and `swift test` as the default verification pass.
+- Avoid treating `docs/superpowers/` as the current contract unless you first update it to match the code.
 
-## Common Tasks
+## Historical Docs
 
-### Adding a new settings section
-1. Add the model fields to `ClaudeSettings.swift` (update `decode`/`encode` and `knownKeys`)
-2. Create a new view in `Sources/Views/`
-3. Add a tab in `SettingsDetailView.swift`
-
-### Adding a new hook event
-Add the event name string to `ClaudeSettings.knownHookEvents` -- the hooks UI auto-generates sections from this list.
-
-### Adding new project scan directories
-Add directory names to `ProjectDiscovery.scanDirectories`. Discovery is recursive up to `maxDepth` (currently 4), skipping hidden dirs, `node_modules`, and `.build`.
-
-### Project discovery and promotion flow
-- `ProjectDiscovery.discoverProjects()` recursively scans scan directories for `.claude/settings.json`.
-- `SettingsStore.loadProjects()` partitions results: UserDefaults paths -> `projectManagers` (managed), remainder -> `discoveredProjects` (lightweight).
-- `SidebarItem` enum has three cases: `.global`, `.project(String)`, `.discovered(String)`.
-- `SettingsStore.promoteDiscoveredProject(_:)` saves to UserDefaults, creates a `SettingsFileManager`, and moves the project from discovered to managed.
-- `SettingsStore.addProject()` (manual via NSOpenPanel) also removes from `discoveredProjects` if the path matches.
-
-## Worktree Workflow
-
-This repo uses git worktrees for isolated feature development. Each worktree is a sibling folder on disk with its own `.build/` directory but shares the same `.claude/settings.json`, `.vscode/settings.json`, and agent configs automatically (they're tracked in git).
-
-### Create a worktree
-```bash
-cd /Users/patricklarocque/Documents/claude-control-pane
-./scripts/new-worktree.sh <branch-name>
-# Creates: ~/Documents/claude-control-pane-<branch-name>
-code ../claude-control-pane-<branch-name>
-```
-
-### Remove a worktree
-```bash
-./scripts/remove-worktree.sh <branch-name>
-# Prompts to also delete the local branch
-```
-
-### List active worktrees
-```bash
-git worktree list
-```
-
-### Key isolation properties per worktree
-- `ClaudeControlPane/.build/` — absent until first `swift build` (fully isolated)
-- `.claude/settings.json` — present (tracked, Claude Code permissions work immediately)
-- `.vscode/settings.json` — present (tracked, Copilot auto-approve works immediately)
-- `.github/copilot-instructions.md` — present (tracked)
-
-## Testing Notes
-
-- No test target currently exists. Validate changes by building (`Cmd+R` or `swift build`).
-- Use `XcodeRefreshCodeIssuesInFile` for quick compiler diagnostics without a full build.
-- The app reads/writes real `settings.json` files, so test with care on your own machine.
-- To test project discovery, create a test project: `mkdir -p ~/Documents/test-project/.claude && echo '{}' > ~/Documents/test-project/.claude/settings.json`
-- Clean up test projects after: `rm -rf ~/Documents/test-project`
+The files under `docs/superpowers/` describe the original, much narrower implementation scope. They are useful as historical context, but they are not the current source of truth. Use `README.md`, `CLAUDE.md`, and the actual source tree for current behavior.
