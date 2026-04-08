@@ -2,6 +2,9 @@
 *.xcuserstate
 xcuserdata/
 *.xcworkspace/xcuserdata/
+.idea/
+erl_crash.dump
+.clang-module-cache/
 
 # Auto Claude data directory
 .auto-claude/

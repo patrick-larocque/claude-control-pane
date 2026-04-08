@@ -3,7 +3,7 @@ import SwiftUI
 struct PermissionsView: View {
     @Bindable var manager: SettingsFileManager
 
-    private let modeOptions = ["default", "bypassPermissions", "plan", "acceptEdits"]
+    private let modeOptions = ["default", "acceptEdits", "plan", "auto", "dontAsk", "bypassPermissions"]
 
     var body: some View {
         Form {
@@ -20,7 +20,7 @@ struct PermissionsView: View {
                         Text(mode).tag(mode)
                     }
                 }
-                .pickerStyle(.segmented)
+                .pickerStyle(.menu)
             }
 
             PermissionListSection(
@@ -108,7 +108,7 @@ struct PermissionListSection: View {
             }
 
             HStack {
-                TextField("e.g. Bash(git:*)", text: $newItem)
+                TextField("e.g. Bash(git *)", text: $newItem)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(.body, design: .monospaced))
                     .onSubmit {

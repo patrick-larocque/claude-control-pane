@@ -66,16 +66,25 @@ struct HooksView: View {
             } else {
                 ForEach(groups) { group in
                     let groupId = group.id
+                    HookMatcherRowView(
+                        matcher: group.matcher ?? "",
+                        onUpdate: { newMatcher in
+                            manager.updateSettings { settings in
+                                guard let gi = settings.hooks[event]?.firstIndex(where: { $0.id == groupId }) else { return }
+                                settings.hooks[event]?[gi].matcher = newMatcher.isEmpty ? nil : newMatcher
+                            }
+                        }
+                    )
                     ForEach(group.hooks) { hook in
                         let hookId = hook.id
                         HookRowView(
-                            command: hook.command,
-                            onUpdate: { newCommand in
+                            hook: hook,
+                            onUpdate: { updatedHook in
                                 manager.updateSettings { settings in
                                     guard let gi = settings.hooks[event]?.firstIndex(where: { $0.id == groupId }),
                                           let hi = settings.hooks[event]?[gi].hooks.firstIndex(where: { $0.id == hookId })
                                     else { return }
-                                    settings.hooks[event]?[gi].hooks[hi].command = newCommand
+                                    settings.hooks[event]?[gi].hooks[hi] = updatedHook
                                 }
                             },
                             onDelete: {
@@ -109,16 +118,49 @@ struct HooksView: View {
     }
 }
 
-struct HookRowView: View {
-    let externalCommand: String
-    @State private var command: String
+struct HookMatcherRowView: View {
+    let externalMatcher: String
+    @State private var matcher: String
     @FocusState private var isFocused: Bool
     var onUpdate: (String) -> Void
+
+    init(matcher: String, onUpdate: @escaping (String) -> Void) {
+        self.externalMatcher = matcher
+        self._matcher = State(initialValue: matcher)
+        self.onUpdate = onUpdate
+    }
+
+    var body: some View {
+        HStack {
+            Text("Matcher")
+                .foregroundStyle(.secondary)
+                .font(.callout)
+                .frame(width: 60, alignment: .leading)
+            TextField("all tools", text: $matcher)
+                .textFieldStyle(.roundedBorder)
+                .font(.system(.callout, design: .monospaced))
+                .focused($isFocused)
+                .onSubmit { onUpdate(matcher) }
+                .onChange(of: isFocused) { _, newFocused in
+                    if !newFocused { onUpdate(matcher) }
+                }
+        }
+        .onChange(of: externalMatcher) { _, newValue in
+            matcher = newValue
+        }
+    }
+}
+
+struct HookRowView: View {
+    let externalHook: Hook
+    @State private var hook: Hook
+    @FocusState private var isFocused: Bool
+    var onUpdate: (Hook) -> Void
     var onDelete: () -> Void
 
-    init(command: String, onUpdate: @escaping (String) -> Void, onDelete: @escaping () -> Void) {
-        self.externalCommand = command
-        self._command = State(initialValue: command)
+    init(hook: Hook, onUpdate: @escaping (Hook) -> Void, onDelete: @escaping () -> Void) {
+        self.externalHook = hook
+        self._hook = State(initialValue: hook)
         self.onUpdate = onUpdate
         self.onDelete = onDelete
     }
@@ -126,15 +168,35 @@ struct HookRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack {
-                TextField("Command", text: $command)
+                Picker("Type", selection: Binding(
+                    get: { hook.type },
+                    set: { newType in
+                        hook.normalizePrimaryPayload(for: newType)
+                        onUpdate(hook)
+                    }
+                )) {
+                    Text("command").tag("command")
+                    Text("http").tag("http")
+                    Text("prompt").tag("prompt")
+                    Text("agent").tag("agent")
+                }
+                .labelsHidden()
+                .frame(width: 110)
+
+                TextField(hook.primaryLabel, text: Binding(
+                    get: { hook.primaryValue },
+                    set: { newValue in
+                        hook.updatePrimaryValue(newValue)
+                    }
+                ))
                     .textFieldStyle(.roundedBorder)
                     .font(.system(.body, design: .monospaced))
                     .focused($isFocused)
                     .onSubmit {
-                        onUpdate(command)
+                        onUpdate(hook)
                     }
                     .onChange(of: isFocused) { _, newFocused in
-                        if !newFocused { onUpdate(command) }
+                        if !newFocused { onUpdate(hook) }
                     }
                 Button(role: .destructive) {
                     onDelete()
@@ -143,14 +205,20 @@ struct HookRowView: View {
                 }
                 .buttonStyle(.borderless)
             }
-            if command.trimmingCharacters(in: .whitespaces).isEmpty {
-                Text("Command cannot be empty — hook will fail at runtime")
+            if let ifCondition = hook.ifCondition, !ifCondition.isEmpty {
+                Text("if: \(ifCondition)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
+            if hook.primaryValue.trimmingCharacters(in: .whitespaces).isEmpty {
+                Text("\(hook.primaryLabel) cannot be empty — this hook will fail at runtime")
                     .font(.caption)
                     .foregroundStyle(.orange)
             }
         }
-        .onChange(of: externalCommand) { _, newValue in
-            command = newValue
+        .onChange(of: externalHook) { _, newValue in
+            hook = newValue
         }
     }
 }
