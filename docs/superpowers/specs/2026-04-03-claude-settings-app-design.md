@@ -1,5 +1,7 @@
 # Claude Control Pane — Design Spec
 
+> Historical note: this document describes the original narrower v1 scope for the app. It is no longer the current source of truth for product scope or architecture. Use `/README.md`, `/CLAUDE.md`, and the current source tree for up-to-date behavior.
+
 A native macOS SwiftUI app for managing Claude Code settings visually. Replaces manual JSON editing of `settings.json` with a GUI for hooks, permissions, and environment variables.
 
 ## Scope

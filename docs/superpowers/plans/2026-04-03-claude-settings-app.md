@@ -1,5 +1,7 @@
 # Claude Control Pane Implementation Plan
 
+> Historical note: this implementation plan reflects the original v1 build-out and no longer matches the app's current scope. Treat it as historical context only; use `/README.md`, `/CLAUDE.md`, and the current codebase as the active source of truth.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a native macOS SwiftUI app that lets users manage Claude Code settings (hooks, permissions, env vars) for global and project-level `settings.json` files.

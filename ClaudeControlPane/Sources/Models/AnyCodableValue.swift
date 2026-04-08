@@ -78,3 +78,97 @@ extension AnyCodableValue: Codable {
         }
     }
 }
+
+extension AnyCodableValue {
+    enum JSONObjectEmptyHandling {
+        case clearField
+        case emptyObject
+    }
+
+    var stringValue: String? {
+        if case .string(let value) = self {
+            return value
+        }
+        return nil
+    }
+
+    var boolValue: Bool? {
+        if case .bool(let value) = self {
+            return value
+        }
+        return nil
+    }
+
+    var intValue: Int? {
+        if case .int(let value) = self {
+            return value
+        }
+        return nil
+    }
+
+    var doubleValue: Double? {
+        switch self {
+        case .double(let value):
+            return value
+        case .int(let value):
+            return Double(value)
+        default:
+            return nil
+        }
+    }
+
+    var arrayValue: [AnyCodableValue]? {
+        if case .array(let value) = self {
+            return value
+        }
+        return nil
+    }
+
+    var dictionaryValue: [String: AnyCodableValue]? {
+        if case .dictionary(let value) = self {
+            return value
+        }
+        return nil
+    }
+
+    static func jsonString(from value: AnyCodableValue?) -> String {
+        guard let value else { return "{}" }
+        guard JSONSerialization.isValidJSONObject(value.toAny()) else {
+            return "{}"
+        }
+        guard let data = try? JSONSerialization.data(
+            withJSONObject: value.toAny(),
+            options: [.prettyPrinted, .sortedKeys]
+        ),
+        var string = String(data: data, encoding: .utf8) else {
+            return "{}"
+        }
+        if !string.hasSuffix("\n") {
+            string.append("\n")
+        }
+        return string
+    }
+
+    static func parseJSONObject(from string: String, emptyHandling: JSONObjectEmptyHandling) throws -> AnyCodableValue? {
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            switch emptyHandling {
+            case .clearField:
+                return nil
+            case .emptyObject:
+                return .dictionary([:])
+            }
+        }
+
+        let data = Data(trimmed.utf8)
+        let object = try JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])
+        guard object is [String: Any] else {
+            throw NSError(
+                domain: "ClaudeControlPane.AnyCodableValue",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Expected a JSON object."]
+            )
+        }
+        return AnyCodableValue.from(object)
+    }
+}

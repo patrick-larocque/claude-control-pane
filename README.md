@@ -1,66 +1,78 @@
 # Claude Control Pane
 
-A native macOS app for managing [Claude Code](https://docs.anthropic.com/en/docs/claude-code) settings visually -- no more hand-editing JSON.
+A native macOS app for inspecting and editing Claude Code configuration without hand-editing JSON.
 
-## What it does
+## What It Covers
 
-Claude Code stores its configuration in `settings.json` files. This app gives you a GUI to manage:
+The app now spans both machine-level and workspace-level Claude surfaces:
 
-- **Hooks** -- event-triggered shell commands (e.g. play a sound when Claude finishes)
-- **Permissions** -- control which tools Claude can use, with allow/deny/ask lists
-- **Environment variables** -- key-value pairs passed to Claude Code sessions
+- Machine settings in `~/.claude/settings.json`
+- Global preferences in `~/.claude.json`
+- Machine agents, skills, instructions, rules, output styles, and hook scripts
+- Workspace shared settings in `.claude/settings.json`
+- Workspace local settings in `.claude/settings.local.json`
+- Workspace shared MCP in `.mcp.json`
+- Workspace local MCP stored under the project entry in `~/.claude.json`
+- Workspace agents, skills, and instruction files
+- Plugin inventory and diagnostics views
 
-It supports both global settings (`~/.claude/settings.json`) and per-project settings, with automatic project discovery from common directories.
+Within editable settings files, the app supports:
 
-## Features
+- Hooks, including extended hook payloads and tool matchers
+- Permissions with allow / deny / ask lists and default mode
+- Environment variables
+- Advanced Claude settings such as model, language, output style, shell, effort, and structured objects like `statusLine`, `sandbox`, and `worktree`
+- Raw JSON editing for the full settings file
 
-- Sidebar with global + per-project settings
-- Live file watching -- picks up external edits automatically
-- Preserves unknown JSON fields (won't clobber settings it doesn't understand)
-- Quick toggle for common hooks (e.g. "Play sound on finish")
-- No external dependencies -- pure Swift + SwiftUI
+## Current Feature Set
 
-## Requirements
+- Machine and workspace navigation in a single `NavigationSplitView`
+- Auto-discovery of Claude workspaces from common directories
+- Separate shared vs local workspace configuration surfaces
+- Live file watching for settings and text-backed editors
+- Lossless round-tripping of unknown JSON fields
+- Validation for object-only structured editors
+- Plugin cache inspection and diagnostics guidance
+- Swift Package test suite covering round-trip behavior and validation logic
 
-- macOS 14 (Sonoma) or later
-- Swift 6 toolchain
-
-## Building
+## Build And Test
 
 ```bash
 cd ClaudeControlPane
 
+# Run the test suite
+swift test
+
 # Build the executable
 swift build
 
-# Or build a proper .app bundle
+# Build a macOS app bundle
 chmod +x build-app.sh
 ./build-app.sh
 ```
 
-The app bundle is created at `.build/debug/Claude Control Pane.app`.
+The app bundle is created at `ClaudeControlPane/.build/debug/Claude Control Pane.app`.
 
-## Project structure
+## Project Layout
 
-```
+```text
 ClaudeControlPane/
   Sources/
     App/                  # App entry point
-    Models/               # Settings data structures (Codable JSON models)
-    Services/             # File I/O, file watching, project discovery
-    Views/                # SwiftUI views (sidebar, hooks, permissions, env vars)
+    Models/               # Claude settings and global-config models
+    Services/             # File managers, discovery, diagnostics
+    Views/                # SwiftUI feature surfaces and text editors
+  Tests/                  # Round-trip and validation tests
   Package.swift           # Swift package manifest
-  build-app.sh            # macOS app bundle builder
+  build-app.sh            # Convenience app-bundle builder
 ```
 
-## How it works
+## Source Of Truth Docs
 
-1. **SettingsFileManager** reads/writes JSON and watches the file system for external changes (debounced, using `DispatchSource`)
-2. **SettingsStore** holds global and per-project managers, discovers projects on launch
-3. **SwiftUI views** bind reactively to the store -- edits save immediately
-
-Unknown JSON fields are preserved via a generic `AnyCodableValue` wrapper, so the app is forward-compatible with new Claude Code settings.
+- `README.md` is the current product overview.
+- `CLAUDE.md` is the current engineering orientation doc.
+- `docs/superpowers/` contains historical plan/spec material from the original narrower scope and should not be treated as the current feature contract.
 
 ## License
 
-MIT -- see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
